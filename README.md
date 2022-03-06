@@ -62,7 +62,7 @@ Lots of other useful information can be found on the
 
   * Windows
     - [PHP Desktop v57.0 for Windows
-](https://github.com/cztomczak/phpdesktop/releases/tag/chrome-v57.0-rc)
+](https://github.com/syracine69/phpdesktop/releases/tag/chrome-v57.0-rc)
       release
     - [PHP Desktop MSIE v1.14](https://github.com/cztomczak/phpdesktop/wiki/PHP-Desktop-MSIE-v1.14)
       wiki page
