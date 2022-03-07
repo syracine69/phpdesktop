@@ -1,15 +1,15 @@
 Chromium Embedded Framework (CEF) Standard Binary Distribution for Windows
 -------------------------------------------------------------------------------
 
-Date:             March 17, 2017
+Date:             March 05, 2022
 
-CEF Version:      3.2987.1596.gc2b4638
+CEF Version:      99.2.9+gf426765+chromium-99.0.4844.51
 CEF URL:          https://bitbucket.org/chromiumembedded/cef.git
-                  @c2b4638063e34456360cc4baec4cf914df41720c
+                  @f42676506b8062218bef80deccd403c47a409333
 
-Chromium Verison: 57.0.2987.98
+Chromium Version: 99.0.4844.51
 Chromium URL:     https://chromium.googlesource.com/chromium/src.git
-                  @a6a06b78087c9fdb4b12fe0ac1b87fdc10179f8b
+                  @76f0c6da1542cef970137d8fd354b25283390554
 
 This distribution contains all components necessary to build and distribute an
 application using CEF on the Windows platform. Please see the LICENSING
@@ -89,8 +89,8 @@ The following components are required. CEF will not function without them.
   * icudtl.dat
 
 * V8 snapshot data.
-  * natives_blob.bin
   * snapshot_blob.bin
+  * v8_context_snapshot.bin
 
 Optional components:
 
@@ -114,34 +114,41 @@ run but any related functionality may become broken or disabled.
   CefSettings.pack_loading_disabled. The resources directory path can be
   customized using CefSettings.resources_dir_path.
 
-  * cef.pak
-  * cef_100_percent.pak
-  * cef_200_percent.pak
+  * chrome_100_percent.pak
+  * chrome_200_percent.pak
+  * resources.pak
     These files contain non-localized resources used by CEF, Chromium and Blink.
     Without these files arbitrary Web components may display incorrectly.
 
-  * cef_extensions.pak
-    This file contains non-localized resources required for extension loading.
-    Pass the `--disable-extensions` command-line flag to disable use of this
-    file. Without this file components that depend on the extension system,
-    such as the PDF viewer, will not function.
+* Direct3D support.
+  * d3dcompiler_47.dll
+  Support for GPU accelerated rendering of HTML5 content like 2D canvas, 3D CSS
+  and WebGL. Without this file the aforementioned capabilities may fail when GPU
+  acceleration is enabled (default in most cases). Use of this bundled version
+  is recommended instead of relying on the possibly old and untested system
+  installed version.
 
-  * devtools_resources.pak
-    This file contains non-localized resources required for Chrome Developer
-    Tools. Without this file Chrome Developer Tools will not function.
-
-* Angle and Direct3D support.
-  * d3dcompiler_43.dll (required for Windows XP)
-  * d3dcompiler_47.dll (required for Windows Vista and newer)
+* ANGLE support.
   * libEGL.dll
   * libGLESv2.dll
-  Without these files HTML5 accelerated content like 2D canvas, 3D CSS and WebGL
-  will not function.
+  Support for rendering of HTML5 content like 2D canvas, 3D CSS and WebGL.
+  Without these files the aforementioned capabilities may fail.
 
-* Widevine CDM support.
-  * widevinecdmadapter.dll
-    Without this file playback of Widevine projected content will not function.
-    See the CefRegisterWidevineCdm() function in cef_web_plugin.h for usage.
+* SwANGLE support.
+  * vk_swiftshader.dll
+  * vk_swiftshader_icd.json
+  * vulkan-1.dll
+  Support for software rendering of HTML5 content like 2D canvas, 3D CSS and
+  WebGL using SwiftShader's Vulkan library as ANGLE's Vulkan backend. Without
+  these files the aforementioned capabilities may fail when GPU acceleration is
+  disabled or unavailable.
+
+* SwiftShader support
+  * swiftshader/libEGL.dll
+  * swiftshader/libGLESv2.dll
+  Deprecated support for software rendering using SwiftShader's GL libraries.
+  Used as an alternative to SwANGLE when the `--use-gl=swiftshader-webgl`
+  command-line flag is specified.
 
 
 LICENSING
