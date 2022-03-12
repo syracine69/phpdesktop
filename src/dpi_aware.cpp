@@ -49,8 +49,8 @@ void SetBrowserDpiSettings(CefRefPtr<CefBrowser> cefBrowser) {
         cefBrowser->GetHost()->SetZoomLevel(newZoomLevel);
         if (cefBrowser->GetHost()->GetZoomLevel() != oldZoomLevel) {
             // Succes.
-            LOG_INFO << "DPI, ppix = " << ppix << ", ppiy = " << ppiy;
-            LOG_INFO << "DPI, browser zoom level = "
+            PHP_DESKTOP_LOG_INFO << "DPI, ppix = " << ppix << ", ppiy = " << ppiy;
+            PHP_DESKTOP_LOG_INFO << "DPI, browser zoom level = "
                       << cefBrowser->GetHost()->GetZoomLevel();
         }
     } else {
@@ -64,8 +64,8 @@ void SetBrowserDpiSettings(CefRefPtr<CefBrowser> cefBrowser) {
         if (!already_logged) {
             already_logged = true;
             // Success.
-            LOG_INFO << "DPI, ppix = " << ppix << ", ppiy = " << ppiy;
-            LOG_INFO << "DPI, browser zoom level = "
+            PHP_DESKTOP_LOG_INFO << "DPI, ppix = " << ppix << ", ppiy = " << ppiy;
+            PHP_DESKTOP_LOG_INFO << "DPI, browser zoom level = "
                       << cefBrowser->GetHost()->GetZoomLevel();
         }
     }
@@ -96,7 +96,7 @@ void GetDpiAwareWindowSize(int* width, int* height) {
     if (newZoomLevel > 0.0) {
         *width = *width + (int)ceil(newZoomLevel * 0.25 * (*width));
         *height = *height + (int)ceil(newZoomLevel * 0.25 * (*height));
-        LOG_INFO << "DPI, window enlarged by "
+        PHP_DESKTOP_LOG_INFO << "DPI, window enlarged by "
                   << ceil(newZoomLevel * 0.25 * 100) << "%"
                   << " new width/height = " << *width << "/" << *height;
     }

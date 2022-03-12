@@ -52,19 +52,19 @@ void InitializeLogging(bool show_console, std::string log_level,
                     NULL);
         if (g_logFileHandle == INVALID_HANDLE_VALUE) {
             g_logFileHandle = NULL;
-            LOG_ERROR << "Opening log file for appending failed";
+            PHP_DESKTOP_LOG_ERROR << "Opening log file for appending failed";
             return;
         }
         int fd = _open_osfhandle((intptr_t)g_logFileHandle, _O_APPEND | _O_RDONLY);
         if (fd == -1) {
-            LOG_ERROR << "Opening log file for appending failed, "
+            PHP_DESKTOP_LOG_ERROR << "Opening log file for appending failed, "
                       << "_open_osfhandle() failed";
             return;
         }
         FILE* pFile = _fdopen(fd, "a+");
         if (pFile == 0) {
             _close(fd);
-            LOG_ERROR << "Opening log file for appending failed, "
+            PHP_DESKTOP_LOG_ERROR << "Opening log file for appending failed, "
                       << "_fdopen() failed";
             return;
         }

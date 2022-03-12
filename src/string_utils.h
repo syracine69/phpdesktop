@@ -24,3 +24,5 @@ std::string ReplaceString(std::string subject, const std::string& search,
 void ReplaceStringInPlace(std::string& subject, const std::string& search,
                           const std::string& replace);
 std::string TrimString(std::string s);
+
+std::string GetDataURI(const std::string& data, const std::string& mime_type);

@@ -11,6 +11,8 @@
 #include <cctype>
 #include <locale>
 
+#include "include/cef_parser.h"
+
 void Utf8ToWide(const char* utf8String, wchar_t* wideString, int wideSize) {
     int copiedCharacters = MultiByteToWideChar(CP_UTF8, 0, utf8String, -1,
             wideString, wideSize);
@@ -106,4 +108,13 @@ static inline std::string &rTrimString(std::string &s) {
 }
 std::string TrimString(std::string s) {
     return lTrimString(rTrimString(s));
+}
+
+// Stolen from ChromiumEmbedded Project - BSD License
+// cef/tests/cefsimple/simple_handler.cc
+// Returns a data: URI with the specified contents.
+std::string GetDataURI(const std::string& data, const std::string& mime_type) {
+    return "data:" + mime_type + ";base64," +
+        CefURIEncode(CefBase64Encode(data.data(), data.size()), false)
+        .ToString();
 }

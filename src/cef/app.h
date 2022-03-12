@@ -19,27 +19,27 @@ public:
     // CefApp methods:
     virtual void OnBeforeCommandLineProcessing(
             const CefString& process_type,
-            CefRefPtr<CefCommandLine> command_line) OVERRIDE;
+            CefRefPtr<CefCommandLine> command_line) override;
   
     virtual CefRefPtr<CefBrowserProcessHandler> GetBrowserProcessHandler()
-            OVERRIDE { return this; }
+            override { return this; }
   
     virtual CefRefPtr<CefRenderProcessHandler> GetRenderProcessHandler()
-            OVERRIDE { return this; }
+            override { return this; }
 
     // CefBrowserProcessHandler methods:
-    virtual void OnContextInitialized() OVERRIDE;
+    virtual void OnContextInitialized() override;
 
     // CefRenderProcessHandler methods:
     virtual bool OnProcessMessageReceived(CefRefPtr<CefBrowser> browser,
                                         CefProcessId source_process,
                                         CefRefPtr<CefProcessMessage> message)
-                                        OVERRIDE;
+                                        ;
     virtual void OnContextCreated(CefRefPtr<CefBrowser> browser,
             CefRefPtr<CefFrame> frame,
-            CefRefPtr<CefV8Context> context) OVERRIDE;
-    virtual void OnBrowserCreated(CefRefPtr<CefBrowser> browser) OVERRIDE;
-    virtual void OnBrowserDestroyed(CefRefPtr<CefBrowser> browser) OVERRIDE;
+            CefRefPtr<CefV8Context> context) override;
+    virtual void OnBrowserCreated(CefRefPtr<CefBrowser> browser);
+    virtual void OnBrowserDestroyed(CefRefPtr<CefBrowser> browser) override;
 
 protected:
     // There is one instance of JavascriptApi for each browser.
@@ -50,8 +50,8 @@ protected:
         if (it != javascriptApiMap_.end()) {
             return it->second;
         }
-        LOG_ERROR << "GetJavascriptApi() failed, api not found";
-        return NULL;
+        PHP_DESKTOP_LOG_ERROR << "GetJavascriptApi() failed, api not found";
+        return nullptr;
     }
     void StoreJavascriptApi(CefRefPtr<CefBrowser> browser, 
             CefRefPtr<JavascriptApi> javascriptApi) {
@@ -60,7 +60,7 @@ protected:
         if (it == javascriptApiMap_.end()) {
             javascriptApiMap_[browser->GetIdentifier()] = javascriptApi;
         } else {
-            LOG_ERROR << "StoreJavascriptApi() failed, api already exists";
+            PHP_DESKTOP_LOG_ERROR << "StoreJavascriptApi() failed, api already exists";
         }
     }
     void RemoveJavascriptApi(CefRefPtr<CefBrowser> browser) {
@@ -69,7 +69,7 @@ protected:
         if (it != javascriptApiMap_.end()) {
             javascriptApiMap_.erase(it);
         } else {
-            LOG_ERROR << "RemoveJavascriptApi() failed, api not found";
+            PHP_DESKTOP_LOG_ERROR << "RemoveJavascriptApi() failed, api not found";
         }
     }
 

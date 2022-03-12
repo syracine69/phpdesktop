@@ -35,7 +35,7 @@ std::string GetAnsiTempDirectory() {
     if (isShortPath || !AnsiDirectoryExists(WideToUtf8(tempPath))) {
         // This code will also run if the dir returned by
         // GetTempPathW was invalid.
-        LOG_DEBUG << "The temp directory returned by OS contains "
+        PHP_DESKTOP_LOG_DEBUG << "The temp directory returned by OS contains "
                 "unicode characters: " << WideToUtf8(tempPath).c_str();
         // Fallback 1: C:\\Windows\\Temp
         // -----------------------------

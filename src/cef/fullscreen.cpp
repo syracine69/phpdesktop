@@ -13,7 +13,7 @@ void Fullscreen::ToggleFullscreen() {
     BrowserWindow* browserWindow = GetBrowserWindow(
             cefBrowser_->GetHost()->GetWindowHandle());
     if (!browserWindow) {
-        LOG_ERROR << "GetBrowserWindow() failed in ToggleFullscreen()";
+        PHP_DESKTOP_LOG_ERROR << "GetBrowserWindow() failed in ToggleFullscreen()";
         return;
     }
     HWND hwnd = browserWindow->GetWindowHandle();

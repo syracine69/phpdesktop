@@ -6,6 +6,7 @@
 
 #include <sstream>
 #include <string>
+#include <windows.h>
 
 #include "util.h"
 #include "include/cef_app.h"
@@ -68,7 +69,7 @@ ClientHandler* ClientHandler::GetInstance() {
 bool ClientHandler::OnProcessMessageReceived(CefRefPtr<CefBrowser> browser,
                                     CefProcessId source_process,
                                     CefRefPtr<CefProcessMessage> message) {
-    LOG_DEBUG << "browser[" << browser->GetIdentifier() << "] "
+    PHP_DESKTOP_LOG_DEBUG << "browser[" << browser->GetIdentifier() << "] "
               << "OnProcessMessageReceived: " << message->GetName().ToString();
     if (message->GetName() == "ToggleFullscreen") {
         BrowserWindow* browserWindow = GetBrowserWindow(\
@@ -78,7 +79,7 @@ bool ClientHandler::OnProcessMessageReceived(CefRefPtr<CefBrowser> browser,
         }
         return true;
     }
-    LOG_ERROR << "Unhandled message in OnProcessMessageReceived";
+    PHP_DESKTOP_LOG_ERROR << "Unhandled message in OnProcessMessageReceived";
     return false;
 }
 
@@ -123,7 +124,7 @@ void ClientHandler::OnTitleChange(CefRefPtr<CefBrowser> cefBrowser,
 ///
 void ClientHandler::OnAfterCreated(CefRefPtr<CefBrowser> cefBrowser) {
     REQUIRE_UI_THREAD();
-    LOG_DEBUG << "ClientHandler::OnAfterCreated()";
+    PHP_DESKTOP_LOG_DEBUG << "ClientHandler::OnAfterCreated()";
     json_value* appSettings = GetApplicationSettings();
     bool center_relative_to_parent = \
             (*appSettings)["popup_window"]["center_relative_to_parent"];
@@ -133,7 +134,7 @@ void ClientHandler::OnAfterCreated(CefRefPtr<CefBrowser> cefBrowser) {
         // This block of code gets called for Main window & Devtools window.
         ASSERT(!phpBrowser->GetCefBrowser().get());
         if (!phpBrowser->GetCefBrowser().get()) {
-            LOG_DEBUG << "SetCefBrowser() called in "
+            PHP_DESKTOP_LOG_DEBUG << "SetCefBrowser() called in "
                             "ClientHandler::OnAfterCreated()";
             phpBrowser->SetCefBrowser(cefBrowser);
         }
@@ -155,7 +156,7 @@ void ClientHandler::OnAfterCreated(CefRefPtr<CefBrowser> cefBrowser) {
             if (openerPhpBrowser) {
                 openerHandle = openerPhpBrowser->GetWindowHandle();
             }
-            LOG_DEBUG << "Centering popup window relative to its parent";
+            PHP_DESKTOP_LOG_DEBUG << "Centering popup window relative to its parent";
             CenterWindowRelativeToParent(cefHandle, openerHandle);
         }
     }
@@ -172,11 +173,11 @@ void ClientHandler::OnAfterCreated(CefRefPtr<CefBrowser> cefBrowser) {
 ///
 void ClientHandler::OnBeforeClose(CefRefPtr<CefBrowser> browser) {
     REQUIRE_UI_THREAD();
-    LOG_DEBUG << "OnBeforeClose() hwnd=" 
+    PHP_DESKTOP_LOG_DEBUG << "OnBeforeClose() hwnd=" 
               << (int)browser->GetHost()->GetWindowHandle();
     RemoveBrowserWindow(browser->GetHost()->GetWindowHandle());
     if (g_browserWindows.empty()) {
-        LOG_DEBUG << "Calling CefQuitMessageLoop()";
+        PHP_DESKTOP_LOG_DEBUG << "Calling CefQuitMessageLoop()";
         CefQuitMessageLoop();
     }
 }
@@ -210,7 +211,7 @@ bool ClientHandler::OnBeforePopup(CefRefPtr<CefBrowser> browser,
                             CefRefPtr<CefClient>& client,
                             CefBrowserSettings& settings,
                             bool* no_javascript_access) {
-    LOG_DEBUG << "ClientHandler::OnBeforePopup()";
+    PHP_DESKTOP_LOG_DEBUG << "ClientHandler::OnBeforePopup()";
     // OnBeforePopup does not get called for the DevTools popup window.
     // The devtools window is created using CreatePopupWindow
     // ----
@@ -228,24 +229,29 @@ bool ClientHandler::OnBeforePopup(CefRefPtr<CefBrowser> browser,
     // for the window size.
     int max_width = GetSystemMetrics(SM_CXMAXIMIZED);
     int max_height = GetSystemMetrics(SM_CYMAXIMIZED);
-    if (windowInfo.width > max_width || windowInfo.height > max_height
-            || windowInfo.width <= 0 || windowInfo.height <= 0) {
+    HWND cefHandle = browser->GetHost()->GetWindowHandle();
+    RECT rect;
+    GetWindowRect(cefHandle, &rect);
+    int width = rect.right - rect.left;
+    int height = rect.bottom - rect.top;
+    if (width > max_width || height > max_height
+            || width <= 0 || height <= 0) {
         // Use default size for a popup only when no size was provided.
         int default_width = static_cast<long>(\
                 (*appSettings)["popup_window"]["default_size"][0]);
         int default_height = static_cast<long>(\
                 (*appSettings)["popup_window"]["default_size"][1]);
         if (default_width && default_height) {
-            LOG_INFO << "Setting default size for a popup window "
+            PHP_DESKTOP_LOG_INFO << "Setting default size for a popup window "
                      << default_width << "/" << default_height;
-            windowInfo.width = default_width;
-            windowInfo.height = default_height;
+            width = default_width;
+            height = default_height;
         }
     }
     if (dpi_aware) {
-        GetDpiAwareWindowSize(&windowInfo.width, &windowInfo.height);
+        GetDpiAwareWindowSize(&width, &height);
     }
-    GetCorrectWindowSize(&windowInfo.width, &windowInfo.height);
+    GetCorrectWindowSize(&width, &height);
     if (target_url.ToString().find(GetWebServerUrl()) == 0) {
         // Allow to create.
         return false;
@@ -322,13 +328,13 @@ void ClientHandler::OnLoadingStateChange(CefRefPtr<CefBrowser> cefBrowser,
                                 bool isLoading,
                                 bool canGoBack,
                                 bool canGoForward) {
-    LOG_DEBUG << "OnLoadingStateChange: loading=" << isLoading << ", url=" 
+    PHP_DESKTOP_LOG_DEBUG << "OnLoadingStateChange: loading=" << isLoading << ", url=" 
             << cefBrowser->GetMainFrame()->GetURL().ToString().c_str();
 
     // Is browser loading - if so changing mouse cursor in main.cpp
     BrowserWindow* browserWindow = GetBrowserWindow(cefBrowser->GetHost()->GetWindowHandle());
     if (!browserWindow) {
-        LOG_ERROR << "GetWindowHandle() failed in OnLoadingStateChange";
+        PHP_DESKTOP_LOG_ERROR << "GetWindowHandle() failed in OnLoadingStateChange";
         return;
     }
     g_isBrowserLoading[browserWindow->GetWindowHandle()] = isLoading;
@@ -359,7 +365,7 @@ void ClientHandler::OnLoadError(CefRefPtr<CefBrowser> browser,
                                 const CefString& errorText,
                                 const CefString& failedUrl) {
     REQUIRE_UI_THREAD();
-    LOG_DEBUG << "OnLoadError, errorCode=" << errorCode
+    PHP_DESKTOP_LOG_DEBUG << "OnLoadError, errorCode=" << errorCode
             << ", failedUrl=" << failedUrl.ToString().c_str();
 
     // Don't display an error for downloaded files.
@@ -388,19 +394,19 @@ void ClientHandler::OnLoadError(CefRefPtr<CefBrowser> browser,
         // Reload() is called and correctly resents POST request,
         // but the entry in history before the POST request is lost.
         // Issue 138 explains it in details.
-        LOG_DEBUG << "OnLoadError, calling Reload(), Issue 138";
+        PHP_DESKTOP_LOG_DEBUG << "OnLoadError, calling Reload(), Issue 138";
         browser->Reload();
         return;
     }
 
-    LOG_ERROR << "Failed to load URL: " << failedUrl.ToString();
+    PHP_DESKTOP_LOG_ERROR << "Failed to load URL: " << failedUrl.ToString();
 
     // Display a load error message.
     std::stringstream ss;    
     ss << "<html><body bgcolor=\"white\">"
             "<h2>Loading error " << " (" << errorCode <<
             ").</h2></body></html>";
-    frame->LoadString(ss.str(), failedUrl);
+    frame->LoadURL(GetDataURI(ss.str(), "text/html"));
 }
 
 // ----------------------------------------------------------------------------
@@ -604,12 +610,12 @@ bool ClientHandler::OnKeyEvent(CefRefPtr<CefBrowser> cefBrowser,
 
     if (reload_page_F5 && event.windows_key_code == VK_F5
             && event.type == KEYEVENT_RAWKEYDOWN) {
-        LOG_DEBUG << "F5 pressed, reloading page";
+        PHP_DESKTOP_LOG_DEBUG << "F5 pressed, reloading page";
         cefBrowser->ReloadIgnoreCache();
         return false;
     } else if (devtools_F12 && event.windows_key_code == VK_F12
             && event.type == KEYEVENT_RAWKEYDOWN) {
-        LOG_DEBUG << "F12 pressed, opening developer tools";
+        PHP_DESKTOP_LOG_DEBUG << "F12 pressed, opening developer tools";
         if (!ShowDevTools(cefBrowser)) {
             return false;
         }
@@ -637,10 +643,10 @@ void ClientHandler::OnBeforeDownload(CefRefPtr<CefBrowser> browser,
     json_value* appSettings = GetApplicationSettings();
     bool enable_downloads = (*appSettings)["chrome"]["enable_downloads"];
     if (enable_downloads) {
-        LOG_INFO << "About to download a file: " << suggested_name.ToString();
+        PHP_DESKTOP_LOG_INFO << "About to download a file: " << suggested_name.ToString();
         callback->Continue(suggested_name, true);
     } else {
-        LOG_INFO << "Tried to download a file, but downloads are disabled";
+        PHP_DESKTOP_LOG_INFO << "Tried to download a file, but downloads are disabled";
     }
 }
 
@@ -657,8 +663,8 @@ void ClientHandler::OnDownloadUpdated(
         CefRefPtr<CefDownloadItem> download_item,
         CefRefPtr<CefDownloadItemCallback> callback) {
     if (download_item->IsComplete()) {
-        LOG_INFO << "Download completed, saved to: " << download_item->GetFullPath().ToString();
+        PHP_DESKTOP_LOG_INFO << "Download completed, saved to: " << download_item->GetFullPath().ToString();
     } else if (download_item->IsCanceled()) {
-        LOG_INFO << "Download was cancelled";
+        PHP_DESKTOP_LOG_INFO << "Download was cancelled";
     }
 }

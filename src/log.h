@@ -138,15 +138,15 @@ class FILELOG_DECLSPEC FILELog : public Log<Output2FILE> {};
 #define FILELOG_MAX_LEVEL logDEBUG4
 #endif
 
-#define LOG(level) \
+#define PHP_DESKTOP_LOG(level) \
     if (level > FILELOG_MAX_LEVEL) ;\
     else if (level > FILELog::ReportingLevel() || !Output2FILE::Stream()) ; \
     else FILELog().Get(level)
 
-#define LOG_ERROR LOG(logERROR)
-#define LOG_WARNING LOG(logWARNING)
-#define LOG_INFO LOG(logINFO)
-#define LOG_DEBUG LOG(logDEBUG)
+#define PHP_DESKTOP_LOG_ERROR PHP_DESKTOP_LOG(logERROR)
+#define PHP_DESKTOP_LOG_WARNING PHP_DESKTOP_LOG(logWARNING)
+#define PHP_DESKTOP_LOG_INFO PHP_DESKTOP_LOG(logINFO)
+#define PHP_DESKTOP_LOG_DEBUG PHP_DESKTOP_LOG(logDEBUG)
 
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__)
 
