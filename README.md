@@ -58,7 +58,7 @@ Lots of other useful information can be found on the
 
   * Windows
     - [PHP Desktop v99.2.9 for Windows
-](https://github.com/syracine69/phpdesktop/releases/tag/chrome-v99.2.9-rc)
+](https://github.com/syracine69/phpdesktop/releases/tag/chrome-v99.0-php7.4)
       release  (in progress, not ready)
     - [PHP Desktop MSIE v1.14](https://github.com/cztomczak/phpdesktop/wiki/PHP-Desktop-MSIE-v1.14)
       wiki page  (deprecated)
