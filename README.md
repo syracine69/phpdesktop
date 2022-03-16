@@ -51,13 +51,15 @@ ends, PHP-CGI process is killed and all memory is always freed.
 
 Lots of other useful information can be found on the
 [Knowledge Base](../../wiki/Knowledge-Base) wiki page and on the
-[PHP Desktop Forum](https://groups.google.com/d/forum/phpdesktop).
+[Issues Tracker](../../issues) for release chrome-99.0
+[Discussion Forum](../../discussions) for release chrome-99.0
+[Original PHP Desktop Forum](https://groups.google.com/d/forum/phpdesktop) for old releases
 
 
 ## Downloads
 
   * Windows
-    - [PHP Desktop v99.2.9 for Windows
+    - [PHP Desktop v99.0 for Windows
 ](https://github.com/syracine69/phpdesktop/releases/tag/chrome-v99.0-php7.4)
       release
     - [PHP Desktop MSIE v1.14](https://github.com/cztomczak/phpdesktop/wiki/PHP-Desktop-MSIE-v1.14)
@@ -66,7 +68,7 @@ Lots of other useful information can be found on the
     - [PHP Desktop v72.1 for Linux](https://github.com/cztomczak/phpdesktop/releases/tag/linux-v72.0)
     release
   * Mac
-    - No release yet, see the ongoing funding in
+    - No release yet, see the ongoing funding by Czarek Tomczak in
       [Issue #208](https://github.com/cztomczak/phpdesktop/issues/208)
 
 There are two ways to be notified about new releases:
@@ -80,6 +82,8 @@ There are two ways to be notified about new releases:
   [Knowledge Base](../../wiki/Knowledge-Base), [Settings](../../wiki/Settings)
   and [Chrome settings](../../wiki/Chrome-settings) wiki pages.
 * Ask questions and report problems on the
-  [PHP Desktop Forum](https://groups.google.com/d/forum/phpdesktop)
+  [Issues Tracker](../../issues) for release chrome-99.0
+  [Discussion Forum](../../discussions) for release chrome-99.0
+  [Original PHP Desktop Forum](https://groups.google.com/d/forum/phpdesktop) for old releases
 * See also this externally maintained tutorial:
   [Create your first Desktop Application with PHP and PHP Desktop](http://phpocean.com/tutorials/design-and-illustration/create-your-first-desktop-application-with-php-and-php-desktop/4)
