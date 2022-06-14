@@ -19,7 +19,7 @@ if [[ ${count} != 0 ]]; then
     rm build/bin/*.log
 fi
 
-make -R -f Makefile "$@"
+make -n -R -f Makefile "$@"
 
 rc=$?;
 if [[ ${rc} = 0 ]]; then

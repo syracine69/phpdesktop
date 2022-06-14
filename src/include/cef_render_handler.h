@@ -52,11 +52,11 @@
 /*--cef(source=client)--*/
 class CefRenderHandler : public virtual CefBaseRefCounted {
  public:
-  typedef cef_cursor_type_t CursorType;
   typedef cef_drag_operations_mask_t DragOperation;
   typedef cef_drag_operations_mask_t DragOperationsMask;
   typedef cef_paint_element_type_t PaintElementType;
   typedef std::vector<CefRect> RectList;
+  typedef cef_text_input_mode_t TextInputMode;
 
   ///
   // Return the handler for accessibility notifications. If no handler is
@@ -64,7 +64,7 @@ class CefRenderHandler : public virtual CefBaseRefCounted {
   ///
   /*--cef()--*/
   virtual CefRefPtr<CefAccessibilityHandler> GetAccessibilityHandler() {
-    return NULL;
+    return nullptr;
   }
 
   ///
@@ -162,16 +162,6 @@ class CefRenderHandler : public virtual CefBaseRefCounted {
                                   void* shared_handle) {}
 
   ///
-  // Called when the browser's cursor has changed. If |type| is CT_CUSTOM then
-  // |custom_cursor_info| will be populated with the custom cursor information.
-  ///
-  /*--cef()--*/
-  virtual void OnCursorChange(CefRefPtr<CefBrowser> browser,
-                              CefCursorHandle cursor,
-                              CursorType type,
-                              const CefCursorInfo& custom_cursor_info) {}
-
-  ///
   // Called when the user starts dragging content in the web view. Contextual
   // information about the dragged content is supplied by |drag_data|.
   // (|x|, |y|) is the drag start location in screen coordinates.
@@ -231,6 +221,16 @@ class CefRenderHandler : public virtual CefBaseRefCounted {
   virtual void OnTextSelectionChanged(CefRefPtr<CefBrowser> browser,
                                       const CefString& selected_text,
                                       const CefRange& selected_range) {}
+
+  ///
+  // Called when an on-screen keyboard should be shown or hidden for the
+  // specified |browser|. |input_mode| specifies what kind of keyboard
+  // should be opened. If |input_mode| is CEF_TEXT_INPUT_MODE_NONE, any
+  // existing keyboard for this browser should be hidden.
+  ///
+  /*--cef()--*/
+  virtual void OnVirtualKeyboardRequested(CefRefPtr<CefBrowser> browser,
+                                          TextInputMode input_mode) {}
 };
 
 #endif  // CEF_INCLUDE_CEF_RENDER_HANDLER_H_

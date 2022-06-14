@@ -87,8 +87,7 @@ public:
     virtual bool OnQuotaRequest(CefRefPtr<CefBrowser> browser,
                                 const CefString& origin_url,
                                 int64 new_size,
-                                CefRefPtr<CefRequestCallback> callback)
-                                    override;
+                                CefRefPtr<CefCallback> callback);
 
 private:
     // List of existing browser windows. Only accessed on the CEF UI thread.

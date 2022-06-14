@@ -3,6 +3,10 @@
 // Project website: https://github.com/cztomczak/phpdesktop
 
 #include "app.h"
+#include <string>
+
+#include "include/cef_browser.h"
+#include "include/cef_command_line.h"
 #include "include/wrapper/cef_helpers.h"
 #include "print_handler_gtk.h"
 #include "settings.h"

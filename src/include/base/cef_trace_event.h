@@ -140,12 +140,7 @@
 #define CEF_INCLUDE_BASE_CEF_TRACE_EVENT_H_
 #pragma once
 
-#if defined(TRACE_EVENT0)
-// Do nothing if the macros provided by this header already exist.
-// This can happen in cases where Chromium code is used directly by the
-// client application. When using Chromium code directly always include
-// the Chromium header first to avoid type conflicts.
-#elif defined(USING_CHROMIUM_INCLUDES)
+#if defined(USING_CHROMIUM_INCLUDES)
 // When building CEF include the Chromium header directly.
 #include "base/trace_event/trace_event.h"
 #else  // !USING_CHROMIUM_INCLUDES
@@ -161,10 +156,10 @@
 // - category and name strings must have application lifetime (statics or
 //   literals). They may not include " chars.
 #define TRACE_EVENT0(category, name)                              \
-  cef_trace_event_begin(category, name, NULL, 0, NULL, 0, false); \
+  cef_trace_event_begin(category, name, nullptr, 0, nullptr, 0, false); \
   CEF_INTERNAL_TRACE_END_ON_SCOPE_CLOSE(category, name)
 #define TRACE_EVENT1(category, name, arg1_name, arg1_val)                     \
-  cef_trace_event_begin(category, name, arg1_name, arg1_val, NULL, 0, false); \
+  cef_trace_event_begin(category, name, arg1_name, arg1_val, nullptr, 0, false); \
   CEF_INTERNAL_TRACE_END_ON_SCOPE_CLOSE(category, name)
 #define TRACE_EVENT2(category, name, arg1_name, arg1_val, arg2_name, arg2_val) \
   cef_trace_event_begin(category, name, arg1_name, arg1_val, arg2_name,        \
@@ -190,17 +185,17 @@
 // - category and name strings must have application lifetime (statics or
 //   literals). They may not include " chars.
 #define TRACE_EVENT_INSTANT0(category, name) \
-  cef_trace_event_instant(category, name, NULL, 0, NULL, 0, false)
+  cef_trace_event_instant(category, name, nullptr, 0, nullptr, 0, false)
 #define TRACE_EVENT_INSTANT1(category, name, arg1_name, arg1_val) \
-  cef_trace_event_instant(category, name, arg1_name, arg1_val, NULL, 0, false)
+  cef_trace_event_instant(category, name, arg1_name, arg1_val, nullptr, 0, false)
 #define TRACE_EVENT_INSTANT2(category, name, arg1_name, arg1_val, arg2_name, \
                              arg2_val)                                       \
   cef_trace_event_instant(category, name, arg1_name, arg1_val, arg2_name,    \
                           arg2_val, false)
 #define TRACE_EVENT_COPY_INSTANT0(category, name) \
-  cef_trace_event_instant(category, name, NULL, 0, NULL, 0, true)
+  cef_trace_event_instant(category, name, nullptr, 0, nullptr, 0, true)
 #define TRACE_EVENT_COPY_INSTANT1(category, name, arg1_name, arg1_val) \
-  cef_trace_event_instant(category, name, arg1_name, arg1_val, NULL, 0, true)
+  cef_trace_event_instant(category, name, arg1_name, arg1_val, nullptr, 0, true)
 #define TRACE_EVENT_COPY_INSTANT2(category, name, arg1_name, arg1_val,    \
                                   arg2_name, arg2_val)                    \
   cef_trace_event_instant(category, name, arg1_name, arg1_val, arg2_name, \
@@ -212,17 +207,17 @@
 // - category and name strings must have application lifetime (statics or
 //   literals). They may not include " chars.
 #define TRACE_EVENT_BEGIN0(category, name) \
-  cef_trace_event_begin(category, name, NULL, 0, NULL, 0, false)
+  cef_trace_event_begin(category, name, nullptr, 0, nullptr, 0, false)
 #define TRACE_EVENT_BEGIN1(category, name, arg1_name, arg1_val) \
-  cef_trace_event_begin(category, name, arg1_name, arg1_val, NULL, 0, false)
+  cef_trace_event_begin(category, name, arg1_name, arg1_val, nullptr, 0, false)
 #define TRACE_EVENT_BEGIN2(category, name, arg1_name, arg1_val, arg2_name, \
                            arg2_val)                                       \
   cef_trace_event_begin(category, name, arg1_name, arg1_val, arg2_name,    \
                         arg2_val, false)
 #define TRACE_EVENT_COPY_BEGIN0(category, name) \
-  cef_trace_event_begin(category, name, NULL, 0, NULL, 0, true)
+  cef_trace_event_begin(category, name, nullptr, 0, nullptr, 0, true)
 #define TRACE_EVENT_COPY_BEGIN1(category, name, arg1_name, arg1_val) \
-  cef_trace_event_begin(category, name, arg1_name, arg1_val, NULL, 0, true)
+  cef_trace_event_begin(category, name, arg1_name, arg1_val, nullptr, 0, true)
 #define TRACE_EVENT_COPY_BEGIN2(category, name, arg1_name, arg1_val,    \
                                 arg2_name, arg2_val)                    \
   cef_trace_event_begin(category, name, arg1_name, arg1_val, arg2_name, \
@@ -233,17 +228,17 @@
 // - category and name strings must have application lifetime (statics or
 //   literals). They may not include " chars.
 #define TRACE_EVENT_END0(category, name) \
-  cef_trace_event_end(category, name, NULL, 0, NULL, 0, false)
+  cef_trace_event_end(category, name, nullptr, 0, nullptr, 0, false)
 #define TRACE_EVENT_END1(category, name, arg1_name, arg1_val) \
-  cef_trace_event_end(category, name, arg1_name, arg1_val, NULL, 0, false)
+  cef_trace_event_end(category, name, arg1_name, arg1_val, nullptr, 0, false)
 #define TRACE_EVENT_END2(category, name, arg1_name, arg1_val, arg2_name, \
                          arg2_val)                                       \
   cef_trace_event_end(category, name, arg1_name, arg1_val, arg2_name,    \
                       arg2_val, false)
 #define TRACE_EVENT_COPY_END0(category, name) \
-  cef_trace_event_end(category, name, NULL, 0, NULL, 0, true)
+  cef_trace_event_end(category, name, nullptr, 0, nullptr, 0, true)
 #define TRACE_EVENT_COPY_END1(category, name, arg1_name, arg1_val) \
-  cef_trace_event_end(category, name, arg1_name, arg1_val, NULL, 0, true)
+  cef_trace_event_end(category, name, arg1_name, arg1_val, nullptr, 0, true)
 #define TRACE_EVENT_COPY_END2(category, name, arg1_name, arg1_val, arg2_name, \
                               arg2_val)                                       \
   cef_trace_event_end(category, name, arg1_name, arg1_val, arg2_name,         \
@@ -254,9 +249,9 @@
 // - category and name strings must have application lifetime (statics or
 //   literals). They may not include " chars.
 #define TRACE_COUNTER1(category, name, value) \
-  cef_trace_counter(category, name, NULL, value, NULL, 0, false)
+  cef_trace_counter(category, name, nullptr, value, nullptr, 0, false)
 #define TRACE_COPY_COUNTER1(category, name, value) \
-  cef_trace_counter(category, name, NULL, value, NULL, 0, true)
+  cef_trace_counter(category, name, nullptr, value, nullptr, 0, true)
 
 // Records the values of a multi-parted counter called "name" immediately.
 // The UI will treat value1 and value2 as parts of a whole, displaying their
@@ -281,9 +276,9 @@
 //   bits will be xored with a hash of the process ID so that the same pointer
 //   on two different processes will not collide.
 #define TRACE_COUNTER_ID1(category, name, id, value) \
-  cef_trace_counter_id(category, name, id, NULL, value, NULL, 0, false)
+  cef_trace_counter_id(category, name, id, nullptr, value, nullptr, 0, false)
 #define TRACE_COPY_COUNTER_ID1(category, name, id, value) \
-  cef_trace_counter_id(category, name, id, NULL, value, NULL, 0, true)
+  cef_trace_counter_id(category, name, id, nullptr, value, nullptr, 0, true)
 
 // Records the values of a multi-parted counter called "name" immediately.
 // The UI will treat value1 and value2 as parts of a whole, displaying their
@@ -320,18 +315,18 @@
 // operation must use the same |name| and |id|. Each event can have its own
 // args.
 #define TRACE_EVENT_ASYNC_BEGIN0(category, name, id) \
-  cef_trace_event_async_begin(category, name, id, NULL, 0, NULL, 0, false)
+  cef_trace_event_async_begin(category, name, id, nullptr, 0, nullptr, 0, false)
 #define TRACE_EVENT_ASYNC_BEGIN1(category, name, id, arg1_name, arg1_val)    \
-  cef_trace_event_async_begin(category, name, id, arg1_name, arg1_val, NULL, \
+  cef_trace_event_async_begin(category, name, id, arg1_name, arg1_val, nullptr, \
                               0, false)
 #define TRACE_EVENT_ASYNC_BEGIN2(category, name, id, arg1_name, arg1_val, \
                                  arg2_name, arg2_val)                     \
   cef_trace_event_async_begin(category, name, id, arg1_name, arg1_val,    \
                               arg2_name, arg2_val, false)
 #define TRACE_EVENT_COPY_ASYNC_BEGIN0(category, name, id) \
-  cef_trace_event_async_begin(category, name, id, NULL, 0, NULL, 0, true)
+  cef_trace_event_async_begin(category, name, id, nullptr, 0, nullptr, 0, true)
 #define TRACE_EVENT_COPY_ASYNC_BEGIN1(category, name, id, arg1_name, arg1_val) \
-  cef_trace_event_async_begin(category, name, id, arg1_name, arg1_val, NULL,   \
+  cef_trace_event_async_begin(category, name, id, arg1_name, arg1_val, nullptr,   \
                               0, true)
 #define TRACE_EVENT_COPY_ASYNC_BEGIN2(category, name, id, arg1_name, arg1_val, \
                                       arg2_name, arg2_val)                     \
@@ -345,13 +340,13 @@
 // phase of an asynchronous operation. The ASYNC_BEGIN event must not have any
 // ASYNC_STEP_PAST events.
 #define TRACE_EVENT_ASYNC_STEP_INTO0(category, name, id, step) \
-  cef_trace_event_async_step_into(category, name, id, step, NULL, 0, false)
+  cef_trace_event_async_step_into(category, name, id, step, nullptr, 0, false)
 #define TRACE_EVENT_ASYNC_STEP_INTO1(category, name, id, step, arg1_name, \
                                      arg1_val)                            \
   cef_trace_event_async_step_into(category, name, id, step, arg1_name,    \
                                   arg1_val, false)
 #define TRACE_EVENT_COPY_ASYNC_STEP_INTO0(category, name, id, step) \
-  cef_trace_event_async_step_into(category, name, id, step, NULL, 0, true)
+  cef_trace_event_async_step_into(category, name, id, step, nullptr, 0, true)
 #define TRACE_EVENT_COPY_ASYNC_STEP_INTO1(category, name, id, step, arg1_name, \
                                           arg1_val)                            \
   cef_trace_event_async_step_into(category, name, id, step, arg1_name,         \
@@ -364,13 +359,13 @@
 // phase of an asynchronous operation. The ASYNC_BEGIN event must not have any
 // ASYNC_STEP_INTO events.
 #define TRACE_EVENT_ASYNC_STEP_PAST0(category, name, id, step) \
-  cef_trace_event_async_step_past(category, name, id, step, NULL, 0, false)
+  cef_trace_event_async_step_past(category, name, id, step, nullptr, 0, false)
 #define TRACE_EVENT_ASYNC_STEP_PAST1(category, name, id, step, arg1_name, \
                                      arg1_val)                            \
   cef_trace_event_async_step_past(category, name, id, step, arg1_name,    \
                                   arg1_val, false)
 #define TRACE_EVENT_COPY_ASYNC_STEP_PAST0(category, name, id, step) \
-  cef_trace_event_async_step_past(category, name, id, step, NULL, 0, true)
+  cef_trace_event_async_step_past(category, name, id, step, nullptr, 0, true)
 #define TRACE_EVENT_COPY_ASYNC_STEP_PAST1(category, name, id, step, arg1_name, \
                                           arg1_val)                            \
   cef_trace_event_async_step_past(category, name, id, step, arg1_name,         \
@@ -379,18 +374,18 @@
 // Records a single ASYNC_END event for "name" immediately. If the category
 // is not enabled, then this does nothing.
 #define TRACE_EVENT_ASYNC_END0(category, name, id) \
-  cef_trace_event_async_end(category, name, id, NULL, 0, NULL, 0, false)
+  cef_trace_event_async_end(category, name, id, nullptr, 0, nullptr, 0, false)
 #define TRACE_EVENT_ASYNC_END1(category, name, id, arg1_name, arg1_val)       \
-  cef_trace_event_async_end(category, name, id, arg1_name, arg1_val, NULL, 0, \
+  cef_trace_event_async_end(category, name, id, arg1_name, arg1_val, nullptr, 0, \
                             false)
 #define TRACE_EVENT_ASYNC_END2(category, name, id, arg1_name, arg1_val, \
                                arg2_name, arg2_val)                     \
   cef_trace_event_async_end(category, name, id, arg1_name, arg1_val,    \
                             arg2_name, arg2_val, false)
 #define TRACE_EVENT_COPY_ASYNC_END0(category, name, id) \
-  cef_trace_event_async_end(category, name, id, NULL, 0, NULL, 0, true)
+  cef_trace_event_async_end(category, name, id, nullptr, 0, nullptr, 0, true)
 #define TRACE_EVENT_COPY_ASYNC_END1(category, name, id, arg1_name, arg1_val)  \
-  cef_trace_event_async_end(category, name, id, arg1_name, arg1_val, NULL, 0, \
+  cef_trace_event_async_end(category, name, id, arg1_name, arg1_val, nullptr, 0, \
                             true)
 #define TRACE_EVENT_COPY_ASYNC_END2(category, name, id, arg1_name, arg1_val, \
                                     arg2_name, arg2_val)                     \
@@ -405,7 +400,7 @@ class CefTraceEndOnScopeClose {
   CefTraceEndOnScopeClose(const char* category, const char* name)
       : category_(category), name_(name) {}
   ~CefTraceEndOnScopeClose() {
-    cef_trace_event_end(category_, name_, NULL, 0, NULL, 0, false);
+    cef_trace_event_end(category_, name_, nullptr, 0, nullptr, 0, false);
   }
 
  private:

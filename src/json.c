@@ -143,7 +143,7 @@ static int new_value (json_state * state,
                return 0;
             }
 
-            value->_reserved.object_mem = (*(char **) &value->u.object.values) + values_size;
+            value->_reserved.object_mem = (char *) value->u.object.values + values_size;
 
             value->u.object.length = 0;
             break;
@@ -192,7 +192,7 @@ static int new_value (json_state * state,
 }
 
 #define whitespace \
-   case '\n': ++ state.cur_line;  state.cur_col = 0; \
+   case '\n': ++ state.cur_line;  state.cur_col = 0; break; \
    case ' ': case '\t': case '\r'
 
 #define string_add(b)  \
@@ -405,7 +405,7 @@ json_value * json_parse_ex (json_settings * settings,
                   case json_object:
 
                      if (state.first_pass)
-                        (*(json_char **) &top->u.object.values) += string_length + 1;
+                        top->u.object.values += (string_length + 1);
                      else
                      {  
                         top->u.object.values [top->u.object.length].name
@@ -722,6 +722,7 @@ json_value * json_parse_ex (json_settings * settings,
                         flags &= ~ flag_need_comma;
                         break;
                      }
+                     break;
 
                   default:
                      sprintf (error, "%d:%d: Unexpected `%c` in object", line_and_col, b);

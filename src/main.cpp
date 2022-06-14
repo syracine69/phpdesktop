@@ -1,6 +1,18 @@
 // Copyright (c) 2018 PHP Desktop, see the Authors file.
 // All rights reserved. Licensed under BSD 3-clause license.
 // Project website: https://github.com/cztomczak/phpdesktop
+#include "gtk.h"
+
+#include <X11/Xlib.h>
+
+#include <unistd.h>
+#include <memory>
+#include <string>
+
+#include "include/base/cef_logging.h"
+#include "include/cef_app.h"
+#include "include/cef_command_line.h"
+#include "include/wrapper/cef_helpers.h"
 
 #include "app.h"
 #include "client_handler.h"
@@ -8,11 +20,6 @@
 #include "mongoose_server.h"
 #include "settings.h"
 #include "main_message_loop_std.h"
-
-#include "include/base/cef_logging.h"
-#include "include/wrapper/cef_helpers.h"
-
-#include "gtk.h"
 
 #include <cstdlib>
 #include <iostream>
@@ -28,22 +35,22 @@ void create_browser(::Window xid);
 std::string g_cgi_env_from_argv = "";
 
 int x11_error_handler(Display* display, XErrorEvent* event) {
-    LOG(WARNING) << "X error received: "
-                 << "type " << event->type << ", "
-                 << "serial " << event->serial << ", "
-                 << "error_code " << static_cast<int>(event->error_code) << ", "
-                 << "request_code " << static_cast<int>(event->request_code)
-                 << ", "
-                 << "minor_code " << static_cast<int>(event->minor_code);
-    return 0;
+  LOG(WARNING) << "X error received: "
+               << "type " << event->type << ", "
+               << "serial " << event->serial << ", "
+               << "error_code " << static_cast<int>(event->error_code) << ", "
+               << "request_code " << static_cast<int>(event->request_code)
+               << ", "
+               << "minor_code " << static_cast<int>(event->minor_code);
+  return 0;
 }
 
 int x11_io_error_handler(Display* display) {
-    return 0;
+  return 0;
 }
 
 void app_terminate_signal(int signatl) {
-    LOG(INFO) << "App terminate signal";
+  LOG(INFO) << "App terminate signal";
     CefQuitMessageLoop();
 }
 
@@ -72,7 +79,7 @@ int main(int argc, char **argv) {
     // Provide CEF with command-line arguments.
     CefMainArgs main_args(argc, argv);
     CefRefPtr<CefCommandLine> cmdline = CefCommandLine::CreateCommandLine();
-    cmdline->InitFromArgv(main_args.argc, main_args.argv);
+    cmdline->InitFromArgv(argc, argv);
 
     // Log what process type is launching
     if (!cmdline->HasSwitch("type")) {
@@ -94,15 +101,6 @@ int main(int argc, char **argv) {
         }
         // cmdline->GetCommandLineString().ToString() is buggy.
         LOG(INFO) << "Subprocess args: " << cmdlinestr;
-    }
-
-    // CEF applications have multiple sub-processes (render, plugin, GPU, etc)
-    // that share the same executable. This function checks the command-line
-    // and, if this is a sub-process, executes the appropriate logic.
-    int exit_code = CefExecuteProcess(main_args, NULL, NULL);
-    if (exit_code >= 0) {
-        // The sub-process has completed so return here.
-        return exit_code;
     }
 
     LOG(INFO) << "Executable directory: " << get_executable_dir();
@@ -163,8 +161,13 @@ int main(int argc, char **argv) {
 
     // Specify CEF global settings here
     CefSettings cef_settings;
-    cef_settings.no_sandbox = true;
 
+    // When generating projects with CMake the CEF_USE_SANDBOX value will be defined
+    // automatically. Pass -DUSE_SANDBOX=OFF to the CMake command-line to disable
+    // use of the sandbox.
+    #if !defined(CEF_USE_SANDBOX)
+        cef_settings.no_sandbox = true;
+    #endif
     // log_file
     std::string log_file((*app_settings)["chrome"]["log_file"]);
     log_file = get_full_path(log_file);
@@ -209,33 +212,43 @@ int main(int argc, char **argv) {
 
     // App implements application-level callbacks for the browser
     // process.
-    CefRefPtr<App> app(new App);
+    CefRefPtr<App> app(new App());
 
-    // Initialize GDK threads before CEF.
-    gdk_threads_init();
+    // CEF applications have multiple sub-processes (render, plugin, GPU, etc)
+    // that share the same executable. This function checks the command-line
+    // and, if this is a sub-process, executes the appropriate logic.
+    int exit_code = CefExecuteProcess(main_args, app, nullptr);
+    if (exit_code >= 0) {
+        // The sub-process has completed so return here.
+        return exit_code;
+    }
 
-    scoped_ptr<MainMessageLoop> message_loop;
-    message_loop.reset(new MainMessageLoopStd);
+
+    std::unique_ptr<MainMessageLoop> message_loop;
+    message_loop.reset(new MainMessageLoopStd());
 
     // Log messages created by LOG() macro will be written to debug.log
     // file only after CEF was initialized. Before CEF is initialized
     // all logs are only printed to console.
     LOG(INFO) << "Initialize CEF";
-    CefInitialize(main_args, cef_settings, app.get(), NULL);
+    CefInitialize(main_args, cef_settings, app, nullptr);
+
+    // Force Gtk to use Xwayland (in case a Wayland compositor is being used).
+    gdk_set_allowed_backends("x11");
 
     // The Chromium sandbox requires that there only be a single thread during
     // initialization. Therefore initialize GTK after CEF.
     gtk_init(&argc, &argv_copy);
 
     // Install xlib error handlers so that the application won't be terminated
-    // on non-fatal errors. X11 errors appearing in debug logs usually can be
-    // ignored.
+    // on non-fatal errors. Must be done after initializing GTK.
     XSetErrorHandler(x11_error_handler);
     XSetIOErrorHandler(x11_io_error_handler);
 
     // Install a signal handler so we clean up after ourselves.
     signal(SIGINT, app_terminate_signal);
     signal(SIGTERM, app_terminate_signal);
+
 
     // Create Gtk window
     std::string app_icon_path((*app_settings)["main_window"]["icon"]);
@@ -255,6 +268,8 @@ int main(int argc, char **argv) {
     ::Window xid = get_window_xid(gtk_window);
     LOG(INFO) << "Top window xid=" << xid;
     create_browser(xid);
+    gtk_main();
+
 
     // Run the message loop. This will block until Quit() is called.
     int result = message_loop->Run();
@@ -296,6 +311,8 @@ void create_browser(::Window xid) {
         ClientHandler::GetInstance(),
         mongoose_get_url(),
         browser_settings,
-        NULL);
+        nullptr,
+        nullptr);
     LOG(INFO) << "Browser xid=" << browser->GetHost()->GetWindowHandle();
+
 }

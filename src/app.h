@@ -1,6 +1,8 @@
 // Copyright (c) 2018 PHP Desktop, see the Authors file.
 // All rights reserved. Licensed under BSD 3-clause license.
 // Project website: https://github.com/cztomczak/phpdesktop
+#include <set>
+#include <vector>
 
 #include "include/cef_app.h"
 
@@ -22,7 +24,7 @@ public:
 
     // CefBrowserProcessHandler
     virtual void OnContextInitialized() override;
-    virtual CefRefPtr<CefPrintHandler> GetPrintHandler() override;
+    virtual CefRefPtr<CefPrintHandler> GetPrintHandler();
 
 private:
     CefRefPtr<CefPrintHandler> print_handler_;

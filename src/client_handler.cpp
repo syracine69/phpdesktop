@@ -3,6 +3,21 @@
 // Project website: https://github.com/cztomczak/phpdesktop
 
 #include "client_handler.h"
+
+#include <stdio.h>
+#include <algorithm>
+#include <iomanip>
+#include <sstream>
+#include <string>
+
+#include "include/base/cef_callback.h"
+#include "include/cef_browser.h"
+#include "include/cef_frame.h"
+#include "include/cef_parser.h"
+#include "include/cef_ssl_status.h"
+#include "include/cef_x509_certificate.h"
+#include "include/wrapper/cef_closure_task.h"
+
 #include "settings.h"
 #include "gtk.h"
 
@@ -11,7 +26,7 @@
 
 namespace {
 
-ClientHandler* g_instance = NULL;
+ClientHandler* g_instance = nullptr;
 
 } // namespace
 
@@ -25,7 +40,7 @@ ClientHandler::ClientHandler()
 
 ClientHandler::~ClientHandler()
 {
-    g_instance = NULL;
+    g_instance = nullptr;
 }
 
 // static
@@ -45,7 +60,7 @@ CefRefPtr<CefBrowser> ClientHandler::FindBrowserByXid(::Window xid) {
             return *bit;
         }
     }
-    return NULL;
+    return nullptr;
 }
 
 // CefContextMenuHandler
@@ -110,7 +125,7 @@ bool ClientHandler::OnContextMenuCommand(CefRefPtr<CefBrowser> browser,
         CefWindowInfo window_info;
         CefBrowserSettings settings;
         CefPoint inspect;
-        browser->GetHost()->ShowDevTools(window_info, NULL, settings, inspect);
+        browser->GetHost()->ShowDevTools(window_info, nullptr, settings, inspect);
         return true;
     }
     return false;
@@ -171,8 +186,8 @@ void ClientHandler::OnBeforeClose(CefRefPtr<CefBrowser> browser) {
 
     // Cookies are not flushed to disk when closing app immediately.
     // Need to call FlushStore manually when browser is closing.
-    browser->GetHost()->GetRequestContext()->GetDefaultCookieManager(NULL)
-            ->FlushStore(NULL);
+    browser->GetHost()->GetRequestContext()->GetCookieManager(nullptr)
+            ->FlushStore(nullptr);
 
     // Currently if main window is closed app other popups will be
     // closed too and app terminates. However when "window.close" is
@@ -209,9 +224,9 @@ void ClientHandler::OnBeforeClose(CefRefPtr<CefBrowser> browser) {
 bool ClientHandler::OnQuotaRequest(CefRefPtr<CefBrowser> browser,
                                    const CefString& origin_url,
                                    int64 new_size,
-                                   CefRefPtr<CefRequestCallback> callback) {
+                                   CefRefPtr<CefCallback> callback) {
     CEF_REQUIRE_IO_THREAD();
     // Allow all requests
-    callback->Continue(true);
+    callback->Continue();
     return true;
 }

@@ -9,8 +9,10 @@
 #define CEF_TESTS_SHARED_BROWSER_MAIN_MESSAGE_LOOP_H_
 #pragma once
 
+#include <memory>
+
 #include "include/base/cef_bind.h"
-#include "include/base/cef_scoped_ptr.h"
+#include "include/base/cef_callback.h"
 #include "include/cef_task.h"
 
 #if defined(OS_WIN)
@@ -22,43 +24,44 @@
 // and Windows when not using multi-threaded message loop mode. The methods of
 // this class are thread-safe unless otherwise indicated.
 class MainMessageLoop {
- public:
-  // Returns the singleton instance of this object.
-  static MainMessageLoop* Get();
+  public:
+    // Returns the singleton instance of this object.
+    static MainMessageLoop* Get();
 
-  // Run the message loop. The thread that this method is called on will be
-  // considered the main thread. This blocks until Quit() is called.
-  virtual int Run() = 0;
+    // Run the message loop. The thread that this method is called on will be
+    // considered the main thread. This blocks until Quit() is called.
+    virtual int Run() = 0;
 
-  // Quit the message loop.
-  virtual void Quit() = 0;
+    // Quit the message loop.
+    virtual void Quit() = 0;
 
-  // Post a task for execution on the main message loop.
-  virtual void PostTask(CefRefPtr<CefTask> task) = 0;
+    // Post a task for execution on the main message loop.
+    virtual void PostTask(CefRefPtr<CefTask> task) = 0;
 
-  // Returns true if this message loop runs tasks on the current thread.
-  virtual bool RunsTasksOnCurrentThread() const = 0;
+    // Returns true if this message loop runs tasks on the current thread.
+    virtual bool RunsTasksOnCurrentThread() const = 0;
 
-#if defined(OS_WIN)
-  // Set the current modeless dialog on Windows for proper delivery of dialog
-  // messages when using multi-threaded message loop mode. This method must be
-  // called from the main thread. See http://support.microsoft.com/kb/71450 for
-  // background.
-  virtual void SetCurrentModelessDialog(HWND hWndDialog) = 0;
-#endif
+  #if defined(OS_WIN)
+    // Set the current modeless dialog on Windows for proper delivery of dialog
+    // messages when using multi-threaded message loop mode. This method must be
+    // called from the main thread. See http://support.microsoft.com/kb/71450 for
+    // background.
+    virtual void SetCurrentModelessDialog(HWND hWndDialog) = 0;
+  #endif
 
-  // Post a closure for execution on the main message loop.
-  void PostClosure(const base::Closure& closure);
+    // Post a closure for execution on the main message loop.
+    void PostClosure(base::OnceClosure closure);
+    void PostClosure(const base::RepeatingClosure& closure);
 
- protected:
-  // Only allow deletion via scoped_ptr.
-  friend struct base::DefaultDeleter<MainMessageLoop>;
+  protected:
+    // Only allow deletion via std::unique_ptr.
+    friend std::default_delete<MainMessageLoop>;
 
-  MainMessageLoop();
-  virtual ~MainMessageLoop();
+    MainMessageLoop();
+    virtual ~MainMessageLoop();
 
- private:
-  DISALLOW_COPY_AND_ASSIGN(MainMessageLoop);
+  private:
+    DISALLOW_COPY_AND_ASSIGN(MainMessageLoop);
 };
 
 #define CURRENTLY_ON_MAIN_THREAD() \
@@ -69,7 +72,7 @@ class MainMessageLoop {
 #define MAIN_POST_TASK(task) MainMessageLoop::Get()->PostTask(task)
 
 #define MAIN_POST_CLOSURE(closure) \
-  MainMessageLoop::Get()->PostClosure(closure)
+    MainMessageLoop::Get()->PostClosure(closure)
 
 // Use this struct in conjuction with RefCountedThreadSafe to ensure that an
 // object is deleted on the main thread. For example:
@@ -89,7 +92,7 @@ class MainMessageLoop {
 //
 // base::scoped_refptr<Foo> foo = new Foo();
 // foo->DoSomething();
-// foo = NULL;  // Deletion of |foo| will occur on the main thread.
+// foo = nullptr;  // Deletion of |foo| will occur on the main thread.
 //
 struct DeleteOnMainThread {
   template <typename T>
@@ -97,8 +100,8 @@ struct DeleteOnMainThread {
     if (CURRENTLY_ON_MAIN_THREAD()) {
       delete x;
     } else {
-      MainMessageLoop::Get()->PostClosure(
-          base::Bind(&DeleteOnMainThread::Destruct<T>, x));
+      MainMessageLoop::Get()->PostClosure(base::BindOnce(
+          &DeleteOnMainThread::Destruct<T>, base::Unretained(x)));
     }
   }
 };

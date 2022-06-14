@@ -1,15 +1,15 @@
 Chromium Embedded Framework (CEF) Standard Binary Distribution for Linux
 -------------------------------------------------------------------------------
 
-Date:             November 14, 2018
+Date:             April 16, 2022
 
-CEF Version:      3.3538.1852.gcb937fc
+CEF Version:      100.0.23+ga1e2187+chromium-100.0.4896.127
 CEF URL:          https://bitbucket.org/chromiumembedded/cef.git
-                  @cb937fc9cd02a5b5f4d5aea2d880e05fbab621bf
+                  @a1e2187e83d2ce787f5e1b66d9d480346ed0c76e
 
-Chromium Version: 70.0.3538.102
+Chromium Version: 100.0.4896.127
 Chromium URL:     https://chromium.googlesource.com/chromium/src.git
-                  @da0769ae4373ad685a7892d917e6629f22d4d927
+                  @868b46452cfe324558c39dbf9182f86a609296db
 
 This distribution contains all components necessary to build and distribute an
 application using CEF on the Linux platform. Please see the LICENSING
@@ -23,8 +23,8 @@ cmake       Contains CMake configuration files shared by all targets.
 
 Debug       Contains libcef.so and other components required to run the debug
             version of CEF-based applications. By default these files should be
-            placed in the same directory as the executable and will be copied
-            there as part of the build process.
+            placed in the same directory as libcef.so and will be copied there
+            as part of the build process.
 
 include     Contains all required CEF header files.
 
@@ -33,8 +33,8 @@ libcef_dll  Contains the source code for the libcef_dll_wrapper static library
 
 Release     Contains libcef.so and other components required to run the release
             version of CEF-based applications. By default these files should be
-            placed in the same directory as the executable and will be copied
-            there as part of the build process.
+            placed in the same directory as libcef.so and will be copied there
+            as part of the build process.
 
 Resources   Contains resources required by libcef.so. By default these files
             should be placed in the same directory as libcef.so and will be
@@ -86,7 +86,6 @@ The following components are required. CEF will not function without them.
   * icudtl.dat
 
 * V8 snapshot data.
-  * natives_blob.bin
   * snapshot_blob.bin
   * v8_context_snapshot.bin
 
@@ -114,33 +113,33 @@ run but any related functionality may become broken or disabled.
   CefSettings.pack_loading_disabled. The resources directory path can be
   customized using CefSettings.resources_dir_path.
 
-  * cef.pak
-  * cef_100_percent.pak
-  * cef_200_percent.pak
+  * chrome_100_percent.pak
+  * chrome_200_percent.pak
+  * resources.pak
     These files contain non-localized resources used by CEF, Chromium and Blink.
     Without these files arbitrary Web components may display incorrectly.
 
-  * cef_extensions.pak
-    This file contains non-localized resources required for extension loading.
-    Pass the `--disable-extensions` command-line flag to disable use of this
-    file. Without this file components that depend on the extension system,
-    such as the PDF viewer, will not function.
-
-  * devtools_resources.pak
-    This file contains non-localized resources required for Chrome Developer
-    Tools. Without this file Chrome Developer Tools will not function.
-
-* Angle support.
+* ANGLE support.
   * libEGL.so
   * libGLESv2.so
-  Without these files HTML5 accelerated content like 2D canvas, 3D CSS and WebGL
-  will not function.
+  Support for rendering of HTML5 content like 2D canvas, 3D CSS and WebGL.
+  Without these files the aforementioned capabilities may fail.
 
-* SwiftShader support.
+* SwANGLE support.
+  * libvk_swiftshader.so
+  * libvulkan.so.1
+  * vk_swiftshader_icd.json
+  Support for software rendering of HTML5 content like 2D canvas, 3D CSS and
+  WebGL using SwiftShader's Vulkan library as ANGLE's Vulkan backend. Without
+  these files the aforementioned capabilities may fail when GPU acceleration is
+  disabled or unavailable.
+
+* SwiftShader support
   * swiftshader/libEGL.so
   * swiftshader/libGLESv2.so
-  Without these files WebGL will not function in software-only mode when the GPU
-  is not available or disabled.
+  Deprecated support for software rendering using SwiftShader's GL libraries.
+  Used as an alternative to SwANGLE when the `--use-gl=swiftshader-webgl`
+  command-line flag is specified.
 
 
 LICENSING

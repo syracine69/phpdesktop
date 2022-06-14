@@ -12,7 +12,7 @@
 
 namespace {
 
-MainMessageLoop* g_main_message_loop = NULL;
+MainMessageLoop* g_main_message_loop = nullptr;
 
 }  // namespace
 
@@ -22,7 +22,7 @@ MainMessageLoop::MainMessageLoop() {
 }
 
 MainMessageLoop::~MainMessageLoop() {
-  g_main_message_loop = NULL;
+  g_main_message_loop = nullptr;
 }
 
 // static
@@ -31,7 +31,11 @@ MainMessageLoop* MainMessageLoop::Get() {
   return g_main_message_loop;
 }
 
-void MainMessageLoop::PostClosure(const base::Closure& closure) {
+void MainMessageLoop::PostClosure(base::OnceClosure closure) {
+  PostTask(CefCreateClosureTask(std::move(closure)));
+}
+
+void MainMessageLoop::PostClosure(const base::RepeatingClosure& closure) {
   PostTask(CefCreateClosureTask(closure));
 }
 

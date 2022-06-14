@@ -1,14 +1,14 @@
 TARGET=build/bin/phpdesktop
 
-INCLUDES = -Isrc -Lbuild/lib -Lbuild/bin
+INCLUDES = -Isrc -Lbuild/lib -Lbuild/bin -I./src -I./src/include -I./src/include/base -I./src/include/internal -I./src/include/test -I./src/include/views -I./src/include/wrapper
 
-CCFLAGS = -g -Wall -Werror -std=gnu++11 -pthread $(INCLUDES)
-CCFLAGS += $(shell pkg-config --cflags glib-2.0 gtk+-2.0 gtk+-unix-print-2.0)
+CCFLAGS = -Wfatal-errors -g -Wall -Werror -std=c++14 -pthread $(INCLUDES)
+CCFLAGS += $(shell pkg-config --cflags glib-2.0 gtk+-3.0 gtk+-unix-print-3.0)
 
 CFLAGS_OPTIMIZE = -O3 -fvisibility=hidden
 
 LDFLAGS = -Wl,-rpath,. -Wl,-rpath,"\$$ORIGIN" -lX11 -lcef -lcef_dll_wrapper -Wl,--as-needed -ldl -lpthread
-LDFLAGS += $(shell pkg-config --libs glib-2.0 gtk+-2.0 gtk+-unix-print-2.0)
+LDFLAGS += $(shell pkg-config --libs glib-2.0 gtk+-3.0 gtk+-unix-print-3.0)
 
 OBJS=\
 	src/main.o \
@@ -29,6 +29,15 @@ OBJS=\
 CC=g++
 .PHONY: clean release debug
 
+# Add NDEBUG variable to make command -- Needed for removing CEF linker error message (see https://www.magpcss.org/ceforum/viewtopic.php?f=6&t=18787)
+ifneq (,$(filter DEBUG,$(MAKECMDGOALS)))
+    NDEBUG:=1 # or do whatever you want
+    NDEBUG: release; @echo -n
+endif
+
+NDEBUG=-DNDEBUG # or do whatever you want
+
+
 # When switching between debug/release modes always clean
 # all objects by executing either "./build.sh clean debug"
 # or "./build.sh clean release". Otherwise changes to the
@@ -42,10 +51,10 @@ debug: $(TARGET)
 -include $(patsubst %, %.deps, $(OBJS))
 
 %.o : %.cpp
-	+$(CC) -c -o $@ -MD -MP -MF $@.deps $(CCFLAGS) $(CFLAGS_OPTIMIZE) -Wno-error=deprecated-declarations $<
+	+$(CC) -c $(NDEBUG) -o $@ -MD -MP -MF $@.deps $(CCFLAGS) $(CFLAGS_OPTIMIZE) -Wno-error=deprecated-declarations $<
 
 %.o : %.c
-	+gcc -c -o $@ -MD -MP -MF $@.deps -g -std=c99 -O2 -W -Wall -Werror -pedantic -pthread -pipe -Wno-error=unused-parameter $<
+	+gcc -Wfatal-errors -c -o $@ -MD -MP -MF $@.deps -g -std=c11 -O2 -W -Wall -Werror -pedantic -pthread -pipe -Wno-error=unused-parameter $<
 
 $(TARGET): $(OBJS)
 	+$(CC) $(CCFLAGS) $(CFLAGS_OPTIMIZE) -o $@ $(OBJS) $(LDFLAGS)

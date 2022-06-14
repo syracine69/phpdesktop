@@ -19,7 +19,6 @@ ScopedGdkThreadsEnter::ScopedGdkThreadsEnter() {
   take_lock_ = current_thread != locked_thread_;
 
   if (take_lock_) {
-    gdk_threads_enter();
     locked_thread_ = current_thread;
   }
 }
@@ -27,6 +26,5 @@ ScopedGdkThreadsEnter::ScopedGdkThreadsEnter() {
 ScopedGdkThreadsEnter::~ScopedGdkThreadsEnter() {
   if (take_lock_) {
     locked_thread_ = kInvalidPlatformThreadId;
-    gdk_threads_leave();
   }
 }
